@@ -1,4 +1,3 @@
-# Import the relevant libraries
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -11,7 +10,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
-# Define the Streamlit app
+
 def app():
     
     st.title('Symbol Classification')
@@ -38,13 +37,12 @@ def app():
 
     if st.button('Start'):
         df = pd.read_csv('Arendain_UniqueSmileys.csv', header=None)
-        # st.dataframe(df, use_container_width=True)  
         
         # display the dataset
         st.header("Dataset")
         st.dataframe(df, use_container_width=True) 
 
-        #load the data and the labels
+        # load the data and the labels
         X = df.values[:,0:-1]
         y = df.values[:,-1]    
 
@@ -52,42 +50,37 @@ def app():
         # display the images 
         fig, axs = plt.subplots(4, 10, figsize=(20, 8))
 
-        # Iterate over the images and labels
+
         for index, (image, label) in enumerate(zip(X, y)):
-            # Get the corresponding axes object
             ax = axs.flat[index]
 
-            # Display the image
             ax.imshow(np.reshape(image, (8, 8)), cmap='binary')
 
-            # Add the title
             ax.set_title(f'Training: {label}', fontsize=10)
 
-        # Tighten layout to avoid overlapping
         plt.tight_layout()
         st.pyplot(fig)
         
-        # Split the dataset into training and testing sets
         X_train, X_test, y_train, y_test = train_test_split(X, y, \
             test_size=0.2, random_state=42)
 
-        clf.fit(X_train,y_train)
+        clf.fit(X_train, y_train)
         y_test_pred = clf.predict(X_test)
 
         st.header('Confusion Matrix')
         cm = confusion_matrix(y_test, y_test_pred)
         
-        # Better visualization using seaborn heatmap
         sns.heatmap(cm, annot=True, fmt='g', cmap='Blues', cbar=False)
         st.pyplot()
-        
+
         st.header('Classification Report')
         
-        # Displaying metrics using a bar chart
         metrics = classification_report(y_test, y_test_pred, output_dict=True)
-        df_metrics = pd.DataFrame(metrics).transpose()
+        df_metrics = pd.DataFrame(metrics).transpose().reset_index()
         
-        chart = alt.Chart(df_metrics.reset_index()).melt('index').mark_bar().encode(
+        melted_df = pd.melt(df_metrics, id_vars=['index'], value_vars=['precision', 'recall', 'f1-score', 'support'])
+        
+        chart = alt.Chart(melted_df).mark_bar().encode(
             x='index:N',
             y='value:Q',
             color='variable:N',
@@ -95,7 +88,6 @@ def app():
         ).properties(width=300, height=300)
         
         st.altair_chart(chart)
-    
-# Run the app
+
 if __name__ == "__main__":
     app()
