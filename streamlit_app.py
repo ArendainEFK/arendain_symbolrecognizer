@@ -23,7 +23,8 @@ def app():
     text = """Feature representation: Binary values (1 or 0) representing the 8x8 pixels of an image.
         The dataset consists of four groups with different variations as well as different
         shape classes. The dataset is for me is well varied and can be good for shape type
-        classification or detail classifications."""
+        classification or detail classifications. The groups are labeled as numbers 1, 2,
+        3, and 4."""
     st.write(text)
 
     # display choice of classifier
