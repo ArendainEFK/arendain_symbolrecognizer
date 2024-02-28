@@ -1,4 +1,4 @@
-#Input the relevant libraries
+# Import the relevant libraries
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -60,8 +60,8 @@ def app():
             # Display the image
             ax.imshow(np.reshape(image, (8, 8)), cmap='binary')
 
-        # Add the title
-        ax.set_title(f'Training: {label}', fontsize=10)
+            # Add the title
+            ax.set_title(f'Training: {label}', fontsize=10)
 
         # Tighten layout to avoid overlapping
         plt.tight_layout()
@@ -76,11 +76,26 @@ def app():
 
         st.header('Confusion Matrix')
         cm = confusion_matrix(y_test, y_test_pred)
-        st.text(cm)
+        
+        # Better visualization using seaborn heatmap
+        sns.heatmap(cm, annot=True, fmt='g', cmap='Blues', cbar=False)
+        st.pyplot()
+        
         st.header('Classification Report')
-        # Test the classifier on the testing set
-        st.text(classification_report(y_test, y_test_pred))
+        
+        # Displaying metrics using a bar chart
+        metrics = classification_report(y_test, y_test_pred, output_dict=True)
+        df_metrics = pd.DataFrame(metrics).transpose()
+        
+        chart = alt.Chart(df_metrics.reset_index()).melt('index').mark_bar().encode(
+            x='index:N',
+            y='value:Q',
+            color='variable:N',
+            column='variable:N'
+        ).properties(width=300, height=300)
+        
+        st.altair_chart(chart)
     
-#run the app
+# Run the app
 if __name__ == "__main__":
     app()
